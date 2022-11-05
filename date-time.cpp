@@ -431,28 +431,15 @@ Date_Time::Time Clock::get_time() const{
 }
 
 unsigned long long Clock::daysTo(Date_Time date_x) const{
-    unsigned long long check_date_x;
-    bool date_x_valid = false;
+    Date_Time copy_save_date_time = save_date_time;
+    Date_Time *earlier;
     unsigned short days_in_year = 0;
     unsigned long long days_counter = 0;
     short months_counter;
     short diff_month_koef = 1;
-    if(!correct_date(date_x.dt)){
-        throw std::invalid_argument("Wrong time format");
-    }
-    if(date_x.dt.years >= save_date_time.dt.years){
-        check_date_x = date_x.dt.years - save_date_time.dt.years;
-        date_x_valid = check_date_x > 0 ? true : false;
-        if(check_date_x == 0 && date_x.dt.months - save_date_time.dt.months >= 0){
-            check_date_x = date_x.dt.months - save_date_time.dt.months;
-            date_x_valid = check_date_x > 0 && !date_x_valid ? true : false;
-            if(check_date_x == 0 && date_x.dt.days - save_date_time.dt.days >= 0){
-                check_date_x = date_x.dt.days - save_date_time.dt.days;
-                date_x_valid = check_date_x >= 0 && !date_x_valid ? true : false;
-            }
-        }
-    }
-    if(!date_x_valid){
+
+    earlier = choose_earlier_date(&copy_save_date_time, &date_x);
+    if(earlier == &date_x){
         throw std::invalid_argument("Argument date can't be less than self date");
     }
     for(auto &i : max_vals.max_days){
