@@ -20,8 +20,8 @@ struct Date_Time{
 class Clock{
     private:
         static const struct max_values{
-            unsigned long long max_years = 584942417355;
             /*this num * 365 * 24 * 60 * 60 == max in this type*/
+            unsigned long long max_years = 584942417355;
             unsigned short max_months = 12;
             unsigned short max_days[12] = {
                                         31, 28, 31, 30, 31, 30, 
@@ -33,10 +33,10 @@ class Clock{
         } max_vals;
         Date_Time save_date_time;
         inline static Date_Time __fill_date_time_struct(
-                                                        Date_Time dt_tm,
-                                                        unsigned long long val,
-                                                        std::string format
-                                                        );
+                                            Date_Time dt_tm,
+                                            unsigned long long val,
+                                            std::string format
+                                            );
     public:
         Clock();
         Clock(Date_Time dt_tm);
@@ -55,8 +55,15 @@ class Clock{
                                 );
         static bool correct_date(Date_Time::Date dt);
         static bool correct_time(Date_Time::Time tm);
+        static Date_Time* choose_earlier_date(
+                                            Date_Time *first_date,
+                                            Date_Time *second_date
+                                            );
         static Date_Time current_date_time();
-        static Date_Time get_from_string(std::string date, std::string format);
+        static Date_Time get_from_string(
+                                        std::string date,
+                                        std::string format
+                                        );
         inline void set_date(
                             unsigned short days,
                             unsigned short months,
@@ -145,6 +152,43 @@ bool Clock::correct_time(Date_Time::Time tm){
         return false;
     }
     return true;
+}
+
+Date_Time* Clock::choose_earlier_date(Date_Time *first_date, 
+                                    Date_Time *second_date)
+{
+    unsigned long long first_date2arr[6] = {
+                                    first_date->dt.years,
+                                    first_date->dt.months,
+                                    first_date->dt.days,
+                                    first_date->tm.hours,
+                                    first_date->tm.minutes,
+                                    first_date->tm.seconds,
+                                    };
+    unsigned long long second_date2arr[6] = {
+                                    second_date->dt.years,
+                                    second_date->dt.months,
+                                    second_date->dt.days,
+                                    second_date->tm.hours,
+                                    second_date->tm.minutes,
+                                    second_date->tm.seconds,
+                                    };
+    if(
+        !correct_date(first_date->dt) || !correct_date(second_date->dt) ||
+        !correct_time(first_date->tm) || !correct_time(second_date->tm)
+    )
+    {
+        throw std::invalid_argument("Wrong time format");
+    }
+    for(int i = 0; i < 6; i++){
+        if(first_date2arr[i] < second_date2arr[i]){
+            return first_date;
+        }
+        else if(first_date2arr[i] > second_date2arr[i]){
+            return second_date;
+        }
+    }
+    return first_date;
 }
 
 Date_Time Clock::current_date_time(){
@@ -486,5 +530,9 @@ int main(int argc, char const *argv[]){
     cl4.addSecs(12345678);
     cl4.print();
     std::cout << cl4.daysTo(Clock::current_date_time()) << std::endl;
+    Date_Time f = Clock::get_from_string("21.10.2022 03:45:11", "$D.$M.$Y $h:$m:$s");
+    Date_Time s = Clock::get_from_string("21.10.202 03:45:11", "$D.$M.$Y $h:$m:$s");
+    Clock clcl(*Clock::choose_earlier_date(&f, &s));
+    clcl.print();
     return 0;
 }
