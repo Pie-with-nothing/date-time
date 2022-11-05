@@ -86,7 +86,7 @@ class Clock{
 const Clock::max_values Clock::max_vals;
 
 Clock::Clock(){
-    save_date_time.dt = {0, 0, 0};
+    save_date_time.dt = {1, 1, 1};
     save_date_time.tm = {0, 0, 0};
 }
 
@@ -114,7 +114,7 @@ bool Clock::correct_date(unsigned short days,
     if(max_vals.max_years < years || max_vals.max_months < months){
         return false;
     }
-    return max_vals.max_days[months - 1] < days || !days ? false : true;
+    return max_vals.max_days[months - 1] < days || !days || !years ? false : true;
 }
 
 bool Clock::correct_date(Date_Time::Date dt){
@@ -191,7 +191,7 @@ Date_Time Clock::__fill_date_time_struct(
 }
 
 Date_Time Clock::get_from_string(std::string date, std::string format){
-    Date_Time struc_date = {{0, 0, 0}, {0, 0, 0}};
+    Date_Time struc_date = {{1, 1, 1}, {0, 0, 0}};
     std::string copy_date = date;
     std::string copy_format = format;
     std::string num;
@@ -426,7 +426,7 @@ int main(int argc, char const *argv[]){
     cl2.print();
     Clock cl3 = cl2;
     cl3.print();
-    cl3.set_date(cl3.get_date().days, cl3.get_date().months, 0);
+    cl3.set_date(cl3.get_date().days, cl3.get_date().months, 1);
     cl3.print();
     std::cout << cl2.to_string("\n$h:$m\n$D.$M.$Y\n") << std::endl;
     Date_Time q = Clock::get_from_string("21.10 03:45:11", "$D.$M $h:$m:$s");
