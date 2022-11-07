@@ -4,6 +4,7 @@
 #include <map>
 #include <stdexcept>
 #include <cmath>
+#include <fstream>
 
 struct Date_Time{
     struct Date{
@@ -85,8 +86,8 @@ class Clock{
         void addYears(unsigned long long years);
         inline Date_Time::Date get_date() const;
         inline Date_Time::Time get_time() const;
-        unsigned long long daysTo(Date_Time date_x) const;  //
-        unsigned long long secsTo(Date_Time date_x) const;  //
+        unsigned long long daysTo(Date_Time date_x) const;
+        unsigned long long secsTo(Date_Time date_x) const; 
         std::string to_string(std::string format) const;
         void print() const;
 };
@@ -103,10 +104,6 @@ Clock::Clock(unsigned long long second) : Clock::Clock(){
 }
 
 Clock::Clock(Date_Time dt_tm){
-	/*
-    if(correct_date(dt_tm.dt.days, dt_tm.dt.months, dt_tm.dt.years) &&
-        correct_time(dt_tm.tm.hours, dt_tm.tm.minutes, dt_tm.tm.seconds))
-    */
     if(correct_date(dt_tm.dt) && correct_time(dt_tm.tm)){
         save_date_time = dt_tm;
     }
@@ -252,7 +249,6 @@ Date_Time Clock::get_from_string(std::string date, std::string format){
         num = "";
         added_len = 0;
         for(int i = indx; i < date.length() - 1; i++){
-            //std::cout << copy_date[i];
             if(isdigit(copy_date[i])){
                 num.push_back(copy_date[i]);
             }
@@ -264,7 +260,6 @@ Date_Time Clock::get_from_string(std::string date, std::string format){
             num = num.substr(1);
             added_len = 1;
         }
-        //std::cout << num << std::endl;
         struc_date = __fill_date_time_struct(
                                             struc_date,
                                             std::stol(num),
@@ -273,7 +268,6 @@ Date_Time Clock::get_from_string(std::string date, std::string format){
         copy_date = copy_date.substr(indx + num.length() + added_len);
         copy_format = copy_format.substr(indx + 2);
         indx = copy_format.find("$");
-        //std::cout << copy_date << "\n" << copy_format << "\n" << std::endl;
     }
     return struc_date;
 }
@@ -521,6 +515,14 @@ int main(int argc, char const *argv[]){
     cl3.set_date(cl3.get_date().days, cl3.get_date().months, 1);
     cl3.print();
     std::cout << cl2.to_string("\n$h:$m\n$D.$M.$Y\n") << std::endl;
+
+    std::ofstream out_file;
+    out_file.open("OUT.txt");
+    if(out_file.is_open()){
+        out_file << cl2.to_string("///\n$h:$m\n$D.$M.$Y\n///") << std::endl;
+    }
+    out_file.close();
+
     Date_Time q = Clock::get_from_string("21.10 03:45:11", "$D.$M $h:$m:$s");
     Clock cl4(q);
     cl4.addYears(2019);
