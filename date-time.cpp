@@ -3,6 +3,7 @@
 #include <ctime>
 #include <map>
 #include <stdexcept>
+#include <cmath>
 
 struct Date_Time{
     struct Date{
@@ -463,6 +464,24 @@ unsigned long long Clock::daysTo(Date_Time date_x) const{
     return days_counter;
 }
 
+unsigned long long Clock::secsTo(Date_Time date_x) const{
+    unsigned long long days2secs = daysTo(date_x) * 24 * 60 * 60;
+    short self_time2arr[3] = {
+                            (short)save_date_time.tm.hours,
+                            (short)save_date_time.tm.minutes,
+                            (short)save_date_time.tm.seconds
+                            };
+    short date_x_time2arr[3] = {
+                                (short)date_x.tm.hours,
+                                (short)date_x.tm.minutes,
+                                (short)date_x.tm.seconds
+                                };
+    for(int i = 0; i < 3; i++){
+        days2secs += (date_x_time2arr[i] - self_time2arr[i]) * pow(60, 2 - i);
+    }
+    return days2secs;
+}
+
 std::string Clock::to_string(std::string format) const{
     std::map <std::string, unsigned long long> frmt_pair = {
         {"$Y", save_date_time.dt.years},
@@ -517,9 +536,10 @@ int main(int argc, char const *argv[]){
     cl4.addSecs(12345678);
     cl4.print();
     std::cout << cl4.daysTo(Clock::current_date_time()) << std::endl;
-    Date_Time f = Clock::get_from_string("21.10.2022 03:45:11", "$D.$M.$Y $h:$m:$s");
-    Date_Time s = Clock::get_from_string("21.10.202 03:45:11", "$D.$M.$Y $h:$m:$s");
+    Date_Time f = Clock::get_from_string("21.10.2022 06:45:11", "$D.$M.$Y $h:$m:$s");
+    Date_Time s = Clock::get_from_string("20.10.2022 00:00:01", "$D.$M.$Y $h:$m:$s");
     Clock clcl(*Clock::choose_earlier_date(&f, &s));
     clcl.print();
+    std::cout << clcl.secsTo(f) << std::endl;
     return 0;
 }
