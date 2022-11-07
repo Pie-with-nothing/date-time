@@ -1,2 +1,6 @@
 date-time.exe
 OUT.txt
+date-time-oneFile.cpp
+date-time-oneFile.exe
+date-time.o
+main.o
